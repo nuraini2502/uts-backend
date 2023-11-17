@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\News;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class NewsController extends Controller
 {
@@ -18,7 +20,7 @@ class NewsController extends Controller
         if ($news) {
             $data = [
                 'message' => 'Get All Resource',
-                'date' => '$news'
+                'date' => $news
             ];
             //menampilkan kode 
             return response()->json($data, 200);
@@ -45,18 +47,16 @@ class NewsController extends Controller
     public function store(Request $request)
     {
         //menambahkan resource 
-        $validateData =$request->validate([
-            'title' => 'required',
-            'author' => 'required',
-            'description' => 'required',
-            'content' => 'required',
-            'url' => 'required',
-            'url_image' => 'required',
-            'category' => 'required',
-            'timestamp' => 'timestamp|required'
+        $news = News::create([
+            'title' => $request->title,
+            'author' => $request->author,
+            'description' => $request->description,
+            'content' => $request->content,
+            'url' => $request->url,
+            'url_image' => $request->url_image,
+            'published_at' => Carbon::now(),
+            'category' => $request->category,
         ]);
-
-        $news = News::created($validateData);
 
         //menambahkan pesan dan kode
 
@@ -109,8 +109,8 @@ class NewsController extends Controller
                 'content' => $request->content ?? $news->content,
                 'url' => $request->url ?? $news->url,
                 'url_image' => $request->url_image ?? $news->url_image,
-                'category' => $request->category ?? $news->category,
-                'timestamp' => $request->timestamp ?? $news->timestamp
+                'published_at' => Carbon::now(),
+                'category' => $request->category ?? $news->category
             ];
 
             $news->update($input);
@@ -142,7 +142,7 @@ class NewsController extends Controller
 
             //menambahkan pesan
             $data = [
-                'message' => 'Resource is Detail Succsessfully'
+                'message' => 'Resource is Deleted Succsessfully'
             ];
             return response()->json($data, 200);
         }
@@ -155,10 +155,10 @@ class NewsController extends Controller
     }
     public function search($title)
     {
-        # mencari data Patients berdasarkan name
-        $news = News::where("title", 'LIKE', "%$title%")->get();
+        # mencari data news berdasarkan name
+        $news = News::where("title", 'LIKE', "%{$title}%")->get();
 
-        if (count($news) > 0) {
+        if (count($news)) {
             $data = [
                 'message' => 'Get Detail Searched Resource',
                 'data' => $news
@@ -175,15 +175,15 @@ class NewsController extends Controller
             return response()->json($data, 200);
         }
     }
-    public function sport() {
-        //menampilkan data kategori sport
+    public function sport()
+    {
         $news = News::where("category", "sport")->get();
 
-        //menambahkan pesan 
         $data = [
             'message' => 'Get Sport Resource',
-            'data' => $news
+            'data' => $news,
         ];
+
         return response()->json($data, 200);
     }
     public function finance()

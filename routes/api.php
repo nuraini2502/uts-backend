@@ -3,6 +3,8 @@
 use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +18,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
 
+Route::middleware('auth:sanctum')->group(function () {
     # membuat method get
     Route::get('/news', [NewsController::class, 'index']);
 
@@ -40,11 +45,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/news/search/{title}', [NewsController::class, 'search']);
 
     # membuat method untuk mendapatkan data sport
-    Route::get('/news/categoty/sport', [NewsController::class, 'sport']);
+    Route::get('/news/category/sport', [NewsController::class, 'sport']);   
 
     # membuat method untuk mendapatkan data finance
-    Route::get('/news/categoty/finance', [NewsController::class, 'finance']);
+    Route::get('/news/category/finance', [NewsController::class, 'finance']);
 
     # membuat method untuk mendapatkan data automotive
     Route::get('/news/category/automotive', [NewsController::class, 'automotive']);
 });
+
+# untuk register dan login pake auth
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
